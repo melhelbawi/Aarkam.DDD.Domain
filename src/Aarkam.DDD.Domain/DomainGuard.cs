@@ -151,6 +151,24 @@ public static class DomainGuard
 
             if (constructor is null)
             {
+                foreach (var ctor in type.GetConstructors())
+                {
+                    var parameters = ctor.GetParameters();
+                    if (parameters.Length > 0 && parameters[0].ParameterType == typeof(string) && parameters.Skip(1).All(p => p.IsOptional))
+                    {
+                        return msg =>
+                        {
+                            var args = new object?[parameters.Length];
+                            args[0] = msg;
+                            for (int i = 1; i < parameters.Length; i++)
+                            {
+                                args[i] = parameters[i].DefaultValue;
+                            }
+                            return (TException)ctor.Invoke(args);
+                        };
+                    }
+                }
+
                 return msg => (TException)Activator.CreateInstance(type, msg)!;
             }
 

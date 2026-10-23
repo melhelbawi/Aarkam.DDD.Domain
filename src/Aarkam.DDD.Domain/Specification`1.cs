@@ -237,3 +237,33 @@ internal sealed class ParameterReplacer : ExpressionVisitor
         return ReferenceEquals(node, _oldParameter) ? _newParameter : base.VisitParameter(node);
     }
 }
+
+/// <summary>
+/// Provides extension methods enabling fluent composition of specifications adhering to <see cref="ISpecification{T}"/>.
+/// </summary>
+public static class SpecificationExtensions
+{
+    /// <summary>
+    /// Combines two specifications using a conditional logical AND operation.
+    /// </summary>
+    public static ISpecification<T> And<T>(this ISpecification<T> left, ISpecification<T> right)
+    {
+        return new AndSpecification<T>(left, right);
+    }
+
+    /// <summary>
+    /// Combines two specifications using a conditional logical OR operation.
+    /// </summary>
+    public static ISpecification<T> Or<T>(this ISpecification<T> left, ISpecification<T> right)
+    {
+        return new OrSpecification<T>(left, right);
+    }
+
+    /// <summary>
+    /// Negates the specification using a conditional logical NOT operation.
+    /// </summary>
+    public static ISpecification<T> Not<T>(this ISpecification<T> specification)
+    {
+        return new NotSpecification<T>(specification);
+    }
+}

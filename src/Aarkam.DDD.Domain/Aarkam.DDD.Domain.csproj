@@ -13,7 +13,7 @@
 		<IsPackable>true</IsPackable>
 		<PackageId>Aarkam.DDD.Domain</PackageId>
 		<Title>Aarkam.DDD.Domain</Title>
-		<Version>1.0.0-preview01</Version>
+		<Version>1.0.4</Version>
 		<Authors>Eng. Mohamed ElHelbawi, Aarkam Team</Authors>
 		<Company>Aarkam</Company>
 		<Description>A high-performance, enterprise-grade, lightweight foundation package for Domain-Driven Design (DDD) and Event Sourcing (ES) patterns in modern .NET ecosystems. Provides pristine core abstractions including Entity, AggregateRoot, ValueObject, Domain Events, Smart Enums (Enumeration), Specifications, Sagas, Projections, Auditing, Multi-Tenancy, and Structured Domain Exceptions with machine-readable ErrorCode, Severity categorization, and contextual Details.</Description>

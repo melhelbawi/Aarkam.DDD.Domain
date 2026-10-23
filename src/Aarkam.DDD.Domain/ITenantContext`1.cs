@@ -1,4 +1,4 @@
-﻿namespace Aarkam.DDD.Domain;
+namespace Aarkam.DDD.Domain;
 
 /// <summary>
 /// Defines the abstraction for accessing the ambient multi-tenant execution context.
@@ -65,9 +65,14 @@ public class CurrentTenant : ICurrentTenant
     public string? TenantId => _currentTenantId.Value;
 
     /// <inheritdoc />
+    public virtual bool IsAvailable => !string.IsNullOrWhiteSpace(TenantId);
+
+    /// <inheritdoc />
     public IDisposable Change(string? tenantId)
     {
-        return new DisposeAction(() => SetCurrent(tenantId));
+        var parent = TenantId;
+        SetCurrent(tenantId);
+        return new DisposeAction(() => SetCurrent(parent));
     }
 
     /// <summary>
