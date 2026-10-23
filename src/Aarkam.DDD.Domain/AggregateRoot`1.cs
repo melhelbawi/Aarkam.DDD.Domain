@@ -1,4 +1,4 @@
-﻿using Aarkam.DDD.Domain.Entities;
+using Aarkam.DDD.Domain.Entities;
 
 namespace Aarkam.DDD.Domain;
 
@@ -77,7 +77,7 @@ public abstract class AggregateRoot<TKey> : Entity<TKey>, IAggregateRoot<TKey>
     /// </remarks>
     public virtual string? TenantId { get; protected set; }
 
-    public virtual string? CreatorId { get; protected set; }
+    public virtual string CreatorId { get; protected set; } = null!;
     public virtual DateTimeOffset CreationTime { get; protected set; }
 
     public virtual string? ModifierId { get; protected set; }

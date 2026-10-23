@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Aarkam.DDD.Domain/Aarkam.DDD.Domain.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Aarkam.DDD.Domain.Tests/Aarkam.DDD.Domain.Tests.csproj" />
+  </Folder>
 </Solution>

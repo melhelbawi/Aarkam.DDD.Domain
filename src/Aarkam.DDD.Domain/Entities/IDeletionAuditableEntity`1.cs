@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aarkam.DDD.Domain.Entities;
 
@@ -56,6 +56,17 @@ public interface IDeletionAuditableEntity : IModificationAuditableEntity, ISoftD
 /// <typeparam name="TKey">The primary key type specifying the identity boundary of the entity.</typeparam>
 public abstract class DeletionAuditableEntity<TKey> : ModificationAuditableEntity<TKey>, IDeletionAuditableEntity where TKey : IEquatable<TKey>
 {
+    /// <summary>
+    /// Parameterless constructor required for ORMs like EF Core.
+    /// </summary>
+    protected DeletionAuditableEntity() : base() { }
+
+    /// <summary>
+    /// Initializes a new instance with an explicitly assigned identity.
+    /// </summary>
+    /// <param name="id">The unique identifier to assign.</param>
+    protected DeletionAuditableEntity(TKey id) : base(id) { }
+
     /// <inheritdoc />
     [MaxLength(155)]
     public string? DeleterId { get; private set; }

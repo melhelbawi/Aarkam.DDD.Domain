@@ -1,4 +1,4 @@
-﻿using Aarkam.DDD.Domain;
+using Aarkam.DDD.Domain;
 using Aarkam.DDD.Domain.Entities;
 
 /// <summary>
@@ -16,7 +16,7 @@ using Aarkam.DDD.Domain.Entities;
 /// <see cref="IDomainEvent"/> streams.
 /// </para>
 /// </remarks>
-public interface IAggregateRoot : IDeletionAuditableEntity, IHasExtraProperties
+public interface IAggregateRoot : IDeletionAuditableEntity, IHasExtraProperties, IHasDomainEvents
 {
     /// <summary>
     /// Gets the current structural version sequence of the aggregate instance.
@@ -52,16 +52,6 @@ public interface IAggregateRoot : IDeletionAuditableEntity, IHasExtraProperties
     string GetAggregateType();
 
     /// <summary>
-    /// Extracts a read-only stream containing all uncommitted domain events generated during the current transaction window.
-    /// </summary>
-    /// <returns>A collection of pending, unpersisted <see cref="IDomainEvent"/> instances.</returns>
-    /// <remarks>
-    /// These changes act as the staging payload for persistence adapters. Upon database stream commit successes, 
-    /// this queue must be cleared via <see cref="MarkEventsAsCommitted"/>.
-    /// </remarks>
-    IReadOnlyCollection<IDomainEvent> GetChanges();
-
-    /// <summary>
     /// Reconstitutes the internal state of the aggregate root by systematically replaying an ordered chronological sequence of historical events.
     /// </summary>
     /// <param name="history">The sequential chronological record of past domain events retrieved from the event store.</param>
@@ -70,15 +60,6 @@ public interface IAggregateRoot : IDeletionAuditableEntity, IHasExtraProperties
     /// </remarks>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="history"/> collection reference is null.</exception>
     void LoadFromHistory(IEnumerable<IDomainEvent> history);
-
-    /// <summary>
-    /// Purges the staging queue of uncommitted events, indicating that the state modifications have been permanently recorded by the infrastructure layer.
-    /// </summary>
-    /// <remarks>
-    /// This method is decoupled from the domain context and is designed to be triggered exclusively by unit-of-work dispatchers or 
-    /// repository boundaries following successful writes to the physical event log. Calling this guarantees that <see cref="GetChanges"/> resets to empty.
-    /// </remarks>
-    void MarkEventsAsCommitted();
 }
 
 /// <summary>

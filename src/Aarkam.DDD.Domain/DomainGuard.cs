@@ -1,9 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Aarkam.DDD.Domain;
 
 /// <summary>
 /// Provides a centralized static engine containing highly optimized Guard Clauses to enforce primitive domain invariants and structural parameters.
+/// Designed for Native AOT compilation and zero-allocation hot paths.
 /// </summary>
 /// <remarks>
 /// <b>DESIGN PHILOSOPHY:</b> Guard clauses implement a <b>Fail-Fast</b> design strategy. They validate defensive boundary assertions 
@@ -13,16 +14,32 @@ namespace Aarkam.DDD.Domain;
 public static class DomainGuard
 {
     /// <summary>
+    /// Evaluates a boolean assertion and throws a <see cref="DomainInvalidOperationException"/> with structured error parameters if true.
+    /// </summary>
+    /// <param name="assertion">The conditional state check that trips if true.</param>
+    /// <param name="message">The failure explanation.</param>
+    /// <param name="errorCode">A unique machine-readable error code (defaults to "ERR_GUARD_VIOLATION").</param>
+    /// <param name="severity">The categorical severity rating (defaults to <see cref="ExceptionSeverity.Error"/>).</param>
+    public static void Against(
+        bool assertion,
+        string message,
+        string errorCode = "ERR_GUARD_VIOLATION",
+        ExceptionSeverity severity = ExceptionSeverity.Error)
+    {
+        if (assertion)
+        {
+            throw new DomainInvalidOperationException(message, errorCode, severity);
+        }
+    }
+
+    /// <summary>
     /// Evaluates a boolean assertion and throws a structurally matched exception if the evaluated check satisfies true.
+    /// Native AOT compatible via constructor member preservation.
     /// </summary>
     /// <typeparam name="TException">The target exception type to instantiate (must inherit from <see cref="Exception"/>).</typeparam>
     /// <param name="assertion">The conditional state expression check that, if <see langword="true"/>, trips the panic threshold.</param>
     /// <param name="message">The message injected into the exception instance explaining the failed domain invariant condition.</param>
-    /// <remarks>
-    /// <b>PERFORMANCE NOTE:</b> To prevent heavy garbage collection (GC) and reflection latency under heavy load loops, this method 
-    /// bypasses legacy <see cref="Activator.CreateInstance(Type)"/> execution paths, utilizing a compiled expression factory wrapper instead.
-    /// </remarks>
-    public static void Against<TException>(bool assertion, string message)
+    public static void Against<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TException>(bool assertion, string message)
         where TException : Exception
     {
         if (assertion)
@@ -105,6 +122,7 @@ public static class DomainGuard
 
     /// <summary>
     /// Centralized assertion interceptor verifying complete structural safety compliance across explicit business specifications.
+    /// Automatically propagates the rule's ErrorCode and Severity.
     /// </summary>
     /// <param name="rule">The complex encapsulated business invariant policy rule wrapper to analyze.</param>
     /// <exception cref="BusinessRuleValidationException">Thrown if the evaluate logic loop of <see cref="IBusinessRule.IsBroken"/> satisfies true.</exception>
@@ -117,9 +135,10 @@ public static class DomainGuard
     }
 
     /// <summary>
-    /// Internal, high-performance optimization utility caching dynamic lambda compilation delegates for exception generation.
+    /// Internal, high-performance optimization utility caching dynamic delegates for exception instantiation.
+    /// Resilient to Native AOT where JIT expression compilation is disabled.
     /// </summary>
-    private static class ExceptionFactory<TException> where TException : Exception
+    private static class ExceptionFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TException> where TException : Exception
     {
         private static readonly Func<string, TException> _factory = CreateFactory();
 
@@ -132,12 +151,19 @@ public static class DomainGuard
 
             if (constructor is null)
             {
-                return (msg) => (TException)Activator.CreateInstance(type, msg)!;
+                return msg => (TException)Activator.CreateInstance(type, msg)!;
             }
 
-            var param = System.Linq.Expressions.Expression.Parameter(typeof(string), "message");
-            var body = System.Linq.Expressions.Expression.New(constructor, param);
-            return System.Linq.Expressions.Expression.Lambda<Func<string, TException>>(body, param).Compile();
+            try
+            {
+                var param = System.Linq.Expressions.Expression.Parameter(typeof(string), "message");
+                var body = System.Linq.Expressions.Expression.New(constructor, param);
+                return System.Linq.Expressions.Expression.Lambda<Func<string, TException>>(body, param).Compile();
+            }
+            catch
+            {
+                return msg => (TException)constructor.Invoke([msg]);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aarkam.DDD.Domain.Entities
 {
@@ -52,6 +52,17 @@ namespace Aarkam.DDD.Domain.Entities
     /// </remarks>
     public abstract class ModificationAuditableEntity<TKey> : CreationAuditableEntity<TKey>, IModificationAuditableEntity where TKey : IEquatable<TKey>
     {
+        /// <summary>
+        /// Parameterless constructor required for ORMs like EF Core.
+        /// </summary>
+        protected ModificationAuditableEntity() : base() { }
+
+        /// <summary>
+        /// Initializes a new instance with an explicitly assigned identity.
+        /// </summary>
+        /// <param name="id">The unique identifier to assign.</param>
+        protected ModificationAuditableEntity(TKey id) : base(id) { }
+
         /// <inheritdoc />
         [MaxLength(155)]
         public string? ModifierId { get; private set; }
@@ -72,7 +83,7 @@ namespace Aarkam.DDD.Domain.Entities
             }
 
             ModifierId = modifierId;
-            LastModificationTime = DateTimeOffset.UtcNow; // Explicitly leverages standard timezone tracking
+            LastModificationTime = DateTimeOffset.UtcNow;
             return this;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Aarkam.DDD.Domain;
+namespace Aarkam.DDD.Domain;
 
 /// <summary>
 /// A cross-cutting infrastructure audit event raised when a brand-new Aggregate Root is successfully materialized and stored.
@@ -13,17 +13,17 @@ public sealed class AggregateCreatedEvent : DomainEventBase
     /// <summary>
     /// Gets the unique identifier of the user, system principal, or actor who initiated the creation command.
     /// </summary>
-    public string CreatorId { get; protected set; } = null!;
+    public string CreatorId { get; private set; } = null!;
 
     /// <summary>
     /// Gets the tenant context identifier partition containing this record.
     /// </summary>
-    public string? TenantId { get; protected set; }
+    public string? TenantId { get; private set; }
 
     /// <summary>
     /// Gets the exact timezone-aware point in time when persistence operations completed.
     /// </summary>
-    public DateTimeOffset CreatedAt { get; protected set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>
     /// Parameterless constructor required for JSON serialization and event-stream rehydration.
@@ -63,17 +63,17 @@ public sealed class AggregateModifiedEvent : DomainEventBase
     /// <summary>
     /// Gets the unique identifier of the security principal who performed the most recent state transformation.
     /// </summary>
-    public string ModifierId { get; protected set; } = null!;
+    public string ModifierId { get; private set; } = null!;
 
     /// <summary>
     /// Gets the tenant context identifier partition containing this record.
     /// </summary>
-    public string? TenantId { get; protected set; }
+    public string? TenantId { get; private set; }
 
     /// <summary>
     /// Gets the exact timezone-aware point in time when the mutation was permanently committed.
     /// </summary>
-    public DateTimeOffset ModifiedAt { get; protected set; }
+    public DateTimeOffset ModifiedAt { get; private set; }
 
     private AggregateModifiedEvent() : base() { }
 
@@ -107,17 +107,17 @@ public sealed class AggregateSoftDeletedEvent : DomainEventBase
     /// <summary>
     /// Gets the unique identifier of the user or system principal who logically flagged the destruction of this record.
     /// </summary>
-    public string DeleterId { get; protected set; } = null!;
+    public string DeleterId { get; private set; } = null!;
 
     /// <summary>
     /// Gets the tenant context identifier partition containing this record.
     /// </summary>
-    public string? TenantId { get; protected set; }
+    public string? TenantId { get; private set; }
 
     /// <summary>
     /// Gets the exact timezone-aware point in time when the soft-deletion process was executed.
     /// </summary>
-    public DateTimeOffset DeletedAt { get; protected set; }
+    public DateTimeOffset DeletedAt { get; private set; }
 
     private AggregateSoftDeletedEvent() : base() { }
 
@@ -151,17 +151,17 @@ public sealed class AggregateRestoredEvent : DomainEventBase
     /// <summary>
     /// Gets the unique identifier of the user or actor who reversed the soft-deletion state.
     /// </summary>
-    public string RestorerId { get; protected set; } = null!;
+    public string RestorerId { get; private set; } = null!;
 
     /// <summary>
     /// Gets the tenant context identifier partition containing this record.
     /// </summary>
-    public string? TenantId { get; protected set; }
+    public string? TenantId { get; private set; }
 
     /// <summary>
     /// Gets the exact timezone-aware point in time when the restoration process was finalized.
     /// </summary>
-    public DateTimeOffset RestoredAt { get; protected set; }
+    public DateTimeOffset RestoredAt { get; private set; }
 
     private AggregateRestoredEvent() : base() { }
 

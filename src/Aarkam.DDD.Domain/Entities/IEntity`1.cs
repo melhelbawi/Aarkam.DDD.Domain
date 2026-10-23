@@ -1,4 +1,17 @@
-﻿namespace Aarkam.DDD.Domain.Entities;
+namespace Aarkam.DDD.Domain.Entities;
+
+/// <summary>
+/// Defines the non-generic marker contract for all Domain Entities.
+/// Facilitates reflection, EF Core model configuration, repository constraints, and cross-cutting audit interceptors.
+/// </summary>
+public interface IEntity
+{
+    /// <summary>
+    /// Gets an array of the keys identifying this entity.
+    /// Supports both simple single keys and composite keys uniformly.
+    /// </summary>
+    object?[] GetKeys();
+}
 
 /// <summary>
 /// Defines the fundamental contract for a Domain Entity with a strongly-typed unique identifier.
@@ -8,7 +21,7 @@
 /// In Domain-Driven Design, an Entity is not defined by its attributes, but by a thread of continuity and identity.
 /// This interface ensures that all domain entities expose their identity uniformly.
 /// </remarks>
-public interface IEntity<out TKey>
+public interface IEntity<out TKey> : IEntity
 {
     TKey Id { get; }
 }
@@ -26,6 +39,9 @@ public abstract class Entity<TKey> : IEntity<TKey>, IEquatable<Entity<TKey>>
     /// </summary>
     /// <value>The identity value. The protected setter allows ORMs to materialize state while shielding the identity from external manipulation.</value>
     public virtual TKey Id { get; protected set; } = default!;
+
+    /// <inheritdoc />
+    public virtual object?[] GetKeys() => [Id];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Entity{TKey}"/> class.
@@ -50,7 +66,7 @@ public abstract class Entity<TKey> : IEntity<TKey>, IEquatable<Entity<TKey>>
             throw new ArgumentNullException(nameof(id), "The entity identity cannot be null.");
         }
 
-        if (EqualityComparer<TKey>.Default.Equals(id, default))
+        if (EqualityComparer<TKey>.Default.Equals(id, default!))
         {
             throw new ArgumentException("An explicit identity cannot be assigned a default type value.", nameof(id));
         }
@@ -64,7 +80,7 @@ public abstract class Entity<TKey> : IEntity<TKey>, IEquatable<Entity<TKey>>
     /// <returns><c>true</c> if the identity matches the type's default state; otherwise, <c>false</c>.</returns>
     public virtual bool IsTransient()
     {
-        return EqualityComparer<TKey>.Default.Equals(Id, default);
+        return EqualityComparer<TKey>.Default.Equals(Id, default!);
     }
 
     /// <summary>

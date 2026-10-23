@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aarkam.DDD.Domain.Entities
 {
@@ -51,9 +51,20 @@ namespace Aarkam.DDD.Domain.Entities
     /// </remarks>
     public abstract class CreationAuditableEntity<TKey> : Entity<TKey>, ICreationAuditableEntity where TKey : IEquatable<TKey>
     {
+        /// <summary>
+        /// Parameterless constructor required for ORMs like EF Core.
+        /// </summary>
+        protected CreationAuditableEntity() : base() { }
+
+        /// <summary>
+        /// Initializes a new instance with an explicitly assigned identity.
+        /// </summary>
+        /// <param name="id">The unique identifier to assign.</param>
+        protected CreationAuditableEntity(TKey id) : base(id) { }
+
         /// <inheritdoc />
         [MaxLength(155)]
-        public string CreatorId { get; private set; }
+        public string CreatorId { get; private set; } = null!;
 
         /// <inheritdoc />
         public DateTimeOffset CreationTime { get; private set; }
@@ -72,7 +83,7 @@ namespace Aarkam.DDD.Domain.Entities
             }
 
             CreatorId = creatorId;
-            CreationTime = DateTimeOffset.UtcNow; // DateTimeOffset.UtcNow is preferred over DateTime.UtcNow for DateTimeOffset types
+            CreationTime = DateTimeOffset.UtcNow;
             return this;
         }
     }

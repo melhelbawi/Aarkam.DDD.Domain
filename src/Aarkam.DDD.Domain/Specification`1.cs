@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Linq.Expressions;
 
 namespace Aarkam.DDD.Domain;
@@ -218,7 +218,7 @@ internal sealed class NotSpecification<T> : SpecificationBase<T>
 /// </summary>
 /// <remarks>
 /// <b>EF CORE TRANSLATION TRANSLATION ROLE:</b> Merging separate expressions creates fragmented variable identifiers. 
-/// Using <see cref="Expression.Invoke"/> creates dynamic unresolvable nodes for SQL map engines. 
+/// Using <c>Expression.Invoke</c> creates dynamic unresolvable nodes for SQL map engines. 
 /// This class merges disjoint parameters into a clean, unified tree structure that EF Core can parse without throwing errors.
 /// </remarks>
 internal sealed class ParameterReplacer : ExpressionVisitor
